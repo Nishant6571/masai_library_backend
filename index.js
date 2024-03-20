@@ -8,8 +8,8 @@ const app = express();
 
 app.use(express.json());
 
-app.use("/api", userRouter);
-app.use("/api", bookRouter);
+app.use("/users", userRouter);
+app.use("/books", bookRouter);
 
 // route to check the connection
 app.get("/", (req, res) => {

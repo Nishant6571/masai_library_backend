@@ -1,28 +1,32 @@
 const jwt = require("jsonwebtoken");
-const { UserModel } = require("../models/users.model");
+const { UserModel } = require("../model/user.model");
 
 const isAuth = async (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  console.log(token);
-  if (token) {
-    try {
-      const decoded = jwt.verify(token, "nishant");
-      console.log(decoded);
-      const { userID } = decoded;
-      const user = await UserModel.findOne({ _id: userID });
-      if (user && user.isAdmin) {
-        req.isAdmin = true;
-        next();
-      } else {
-        res.status(403).json({ msg: "Forbidden - Admin access required" });
-      }
-    } catch (err) {
-      res.status(400).json({ msg: "Invalid token" });
-      console.error(err);
+  const access_token = req.headers.authorization?.split(" ")[1];
+  if (!access_token) {
+    return res.status(401).send({ msg: "Unauthorized, no token provided" });
+  }
+
+  try {
+    const decoded = jwt.verify(access_token, "nishant");
+    if (!decoded) {
+      return res.status(403).send({ msg: "Unauthorized, token is invalid" });
     }
-  } else {
-    res.status(401).json({ msg: "Unauthorized - Please provide a token" });
+
+    const user = await UserModel.findById({ _id: decoded.userID });
+    if (!user || !user.isAdmin) {
+      return res
+        .status(403)
+        .send({ msg: "Unauthorized, only admins can perform this action" });
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    res.status(500).send({ msg: "Internal Server Error" });
   }
 };
 
-module.exports = { isAuth };
+module.exports = {
+  isAuth,
+};
