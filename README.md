@@ -91,5 +91,6 @@ This endpoint allows you to add a new book to the system. Note that you need to 
   "price": 19.99,
   "quantity": 100
 }
+```json
 
 
