@@ -1,6 +1,7 @@
 const express = require("express");
 const { connection } = require("./config/db");
 const { userRouter } = require("./route/user.route");
+const { bookRouter } = require("./route/book.route");
 require("dotenv").config();
 
 const app = express();
@@ -8,6 +9,7 @@ const app = express();
 app.use(express.json());
 
 app.use("/api", userRouter);
+app.use("/api", bookRouter);
 
 // route to check the connection
 app.get("/", (req, res) => {
